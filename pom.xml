@@ -294,7 +294,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>AdminLTE-admin</finalName>
+		<finalName>ROOT</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -329,7 +329,7 @@
 				<configuration>
 					<repository>${docker.image.prefix}/${project.artifactId}</repository>
 					<buildArgs>
-						<JAR_FILE>target/ROOT.war</JAR_FILE>
+						<JAR_FILE>target/${project.build.finalName}.war</JAR_FILE>
 					</buildArgs>
 				</configuration>
 			</plugin>
