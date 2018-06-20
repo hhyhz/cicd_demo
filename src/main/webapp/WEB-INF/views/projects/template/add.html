@@ -1,0 +1,44 @@
+<#include "/common/layout_dl.html">
+<@header>
+</@header>
+<@body>
+<form class="form-horizontal layui-form layui-form-pane" method="post" action="/projects/template/doAdd">
+   <div class="box-body">
+     <div class="form-group">
+       <label for="uname" class="col-sm-2 control-label">项目名</label>
+       <div class="col-sm-10">
+      		<input type="text" id="uname" name="templateName" class="form-control" placeholder="请输入模板名" lay-verify="required" check-url="/projects/template/checkName">
+     	</div>
+     </div>
+     <div class="form-group">
+       <label for="uname" class="col-sm-2 control-label">模板描述</label>
+       <div class="col-sm-10">
+      		<input type="text" id="uname" name="desc" class="form-control" placeholder="请输入模板描述" lay-verify="required" >
+     	</div>
+     </div>
+     <div class="form-group">
+       <label for="uname" class="col-sm-2 control-label">git仓库地址</label>
+       <div class="col-sm-10">
+      		<input type="text" id="uname" name="gitUrl" class="form-control" lay-verify='url' placeholder="请输入模板仓库地址或者自动生成"  >
+     	</div>
+     </div>
+     <div class="form-group">
+            <label class="col-sm-2 control-label">流水线脚本</label>
+             <div class="col-sm-10">
+            <textarea id="ps" class="form-control" name="pipelineScript" lay-verify="required" rows="20"  ></textarea>
+          	</div>
+          </div>
+    
+         <div class="form-group">
+         		<label class="col-sm-2 control-label">&nbsp;</label>
+         		 <div class="col-sm-10">
+         		 	<button type="submit" class="btn btn-success" lay-submit lay-filter="submit"><i class="fa fa-save"></i>  提 交</button>
+   		  </div>
+         </div>
+     </div><!-- /.box-body -->
+ </form>
+
+</@body>
+<@footer>
+ 
+</@footer>

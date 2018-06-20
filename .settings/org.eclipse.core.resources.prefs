@@ -1,0 +1,8 @@
+eclipse.preferences.version=1
+encoding//src/main/resources/properties/jdbc.properties=UTF-8
+encoding//src/main/resources/sql/devops.sql=UTF-8
+encoding//src/main/webapp/WEB-INF/views/common/menu.html=UTF-8
+encoding//src/main/webapp/WEB-INF/views/system/menu/add.html=UTF-8
+encoding//src/main/webapp/WEB-INF/views/system/menu/edit.html=UTF-8
+encoding//src/main/webapp/WEB-INF/views/system/user/add.html=UTF-8
+encoding//src/test/java=UTF-8

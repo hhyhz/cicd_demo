@@ -1,0 +1,159 @@
+<#include "/common/layout.html">
+<@header>
+</@header>
+<@body>
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      <small>CICD管理 > 项目管理</small>
+    </h1>
+  </section>
+  <!-- Main content -->
+  <section class="content">
+    <!-- Your Page Content Here -->
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box">
+         <form action="/projects/job/list/1" method="post" class="form-inline">
+          <div class="box-header">
+            <@shiro.hasPermission name="addJob">
+            <div class="input-group">
+           	 <a class="btn btn-primary dialog" href="javascript:;" data-title="创建项目" data-url="/projects/job/add" data-width="800" data-height="650"><i class="fa fa-plus"></i> 创建项目</a>
+            </div>
+            </@shiro.hasPermission>
+             <div class="form-group">
+			    <input type="text" name="daterange" value="${daterange!}" class="form-control date" id="daterange" placeholder="开始日期  - 结束日期" style="width: 228px;">
+			  </div>
+            <div class="input-group">
+               <input type="text" name="search" value="${search!}" class="form-control" placeholder="Search">
+               <div class="input-group-btn">
+                 <button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+                 <a href="/projects/job/list/1" class="btn btn-default"><i class="fa fa-refresh"></i></a>
+               </div>
+            </div>
+            <div class="input-group pull-right">
+                 <button type="button" class="btn btn-primary btn-flat" onclick="exportTo('菜单数据');"><i class="fa fa-file-excel-o"></i> 导出</button>
+            </div>
+          </div><!-- /.box-header -->
+          </form>
+          <div class="box-body table-responsive no-padding">
+            <table class="table table-hover">
+              <tr>
+               
+                <th>编号</th>
+                <th>项目名称</th>
+                  <th>模板名称</th>
+                <th>创建时间</th>
+                 <th>构建状态</th>
+               
+                 <th>最后构建时间</th>
+                 <th>构建信息</th>
+                <th width="150px">操作</th>
+              </tr>
+              <#list pageData.getRecords() as job>
+              	  <tr>
+	               
+	                <td>${(job.id)!}</td>
+	              
+	                <td>${(job.jobName)!}</td>
+	                 <td>${(job.templateName)!}</td>
+	                <td>${(job.created?string('yyyy/MM/dd HH:mm:ss'))!}</td>
+	                   <td id='jobstatus${(job.id)}'>
+	                   <#if job.jobStatus==0 > 
+	                   未构建
+	                   </#if>
+	                    <#if job.jobStatus==1 > 
+	                   构建中
+	                   </#if>
+	                     <#if job.jobStatus==2 > 
+	                  构建完成
+	                   </#if>
+	                   </td>
+	                     <td>${(job.lastBuildDate?string('yyyy/MM/dd HH:mm:ss'))!}</td>
+	                     <td>
+	                       <#if job.lastBuildDate!=null > 
+	                      <a class="btn  btn-xs dialog"
+	                 data-title="构建信息"
+	                 data-url="/projects/job/buildInfo/${job.id}">构建信息</a>
+	                 </#if>
+	                     </td>
+	                <td>
+	                	 <@shiro.hasPermission name="editJob">
+	                	   <a class="btn btn-primary btn-xs dialog" href="javascript:;" data-title="编辑项目" data-url="/projects/job/edit/${(job.id)!}" data-width="800" data-height="650"  data-toggle="tooltip" title="编辑" data-placement="bottom">编辑</a>
+	                	 </@shiro.hasPermission>
+	                	 <@shiro.hasPermission name="buildJob">
+	                	<a class="btn btn-primary btn-xs buttBuild" data-id="${(job.id)!}"  ajax-url="/projects/job/build/${(job.id)!}"
+	                	>构建</a>
+	                	 </@shiro.hasPermission>
+	                 
+	                
+	                 
+	                	<@shiro.hasPermission name="deleteJob">
+	                	<a class="btn btn-danger btn-xs" data-toggle="tooltip" title="删除" data-placement="bottom"
+	                	 data-tiggle="ajax"
+	                	 data-submit-url="/projects/job/delete?id=${(job.id)!}"
+	                	 data-confirm="您确定要删除该条记录吗?">删除</a>
+	                	 </@shiro.hasPermission>
+	                </td>
+	              </tr>
+              </#list>
+            </table>
+          </div><!-- /.box-body -->
+          <div class="box-footer row">
+          <div class="col-md-6">
+         	  <#include "/common/paginateBar.html" />
+	  		  <@paginate pageData=pageData actionUrl="/projects/job/list/" urlParas="?search=${search!}"  />
+            </div>
+            <div class="col-md-6 pull-left">
+            <#include "/common/paginate.html" />
+ 			<@paginate currentPage=pageData.getCurrent() totalPage=pageData.getPages() actionUrl="/projects/job/list/" urlParas="?search=${search!}&pageSize=${pageSize!}"  />
+            </div>
+          </div>
+        </div><!-- /.box -->
+      </div>
+    </div>
+  </section><!-- /.content -->
+</div><!-- /.content-wrapper -->
+</@body>
+<@footer>
+<script>
+$(".buttBuild").on('click',function(){
+	 var url=$(this).attr("ajax-url");
+	 var id=$(this).attr("data-id");
+	 
+	$.confirm({
+	      title: '系统提示',
+	      content: '需要构建吗？',
+	      type:'red',
+	      icon:'glyphicon glyphicon-question-sign',
+	      buttons: {
+	        ok: {
+	            text: '确认',
+	            btnClass: 'btn-primary',
+	            action: function(){
+	            	$("#jobstatus"+id).text("构建中");
+	            	   //Ajax调用处理
+	                $.ajax({
+	                   type: "POST",
+	                   url:url,
+	                   success: function(data){
+	                		window.location.reload();
+	                      }
+	                });
+	            	 
+	            }
+	        },
+	        cancel: {
+	            text: '取消',
+	            btnClass: 'btn-primary',
+	            action: function(){  
+	            }
+	        },
+	      }
+	    });
+}); 
+</script>
+
+</@footer>
+

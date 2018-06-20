@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops.mapper.TemplateMapper">
+
+	<resultMap id="BaseResultMap" type="com.devops.entity.Template">
+		<id column="id" property="id" />
+		<result column="templateName" property="templateName" />
+		<result column="gitUrl" property="gitUrl" />
+		<result column="created" property="created" />
+		<result column="updated" property="updated" />
+		<result column="pipelineScript" property="pipelineScript" />
+	</resultMap>
+		<select id="selectTemplateList" resultType="java.util.HashMap">
+	
+		SELECT u.*  FROM `code_template` u
+		 WHERE 1=1
+		<if test="search != null">
+			AND u.templateName LIKE CONCAT('%',#{search,jdbcType=VARCHAR},'%')
+		</if>
+	
+	</select>
+</mapper>

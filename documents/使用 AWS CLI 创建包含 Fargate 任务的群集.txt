@@ -1,0 +1,79 @@
+
+1.创建集群
+$ aws ecs create-cluster --cluster-name fargate-cluster
+
+2.注册任务定义
+	$ aws ecs register-task-definition --cli-input-json file://$HOME/tasks/fargate-task.json
+
+	2.1编写任务文件
+		{
+			"family": "cicd-task",
+			"executionRoleArn": "ecsServiceRole",
+			"networkMode": "awsvpc",
+			"containerDefinitions": [
+				{
+					"name": "cicd-web",
+					"image": "995807247853.dkr.ecr.us-east-1.amazonaws.com/cicd/demo",
+					"portMappings": [
+						{
+							"containerPort": 8080,
+							"hostPort": 8080,
+							"protocol": "tcp"
+						}
+					],
+				}
+			],
+			"requiresCompatibilities": [
+				"FARGATE"
+			],
+			"cpu": "512",
+			"memory": "1024"
+		}
+
+
+3.创建服务
+
+	3.0 配置网络
+
+		3.0.0 创建vpc和两个子网及安全组
+
+			3.0.0.1 创建 VPC 和两个子网。
+
+				3.0.0.1.1 创建VPC。此示例对 VPC 使用 CIDR 块 10.0.0.0/16，但您可以选择其他 CIDR 块
+					$ aws ec2 create-vpc --cidr-block 10.0.0.0/16
+					返回{"Vpc": {"VpcId": "vpc-xxxxxxxx", ...}}
+
+				3.0.0.1.2 使用上一步中的 VPC ID 创建具有 10.0.1.0/24 CIDR 块的子网。
+					$ aws ec2 create-subnet --vpc-id vpc-XXXXXXXX --cidr-block 10.0.1.0/24
+
+			3.0.0.2 由于 ECS 服务需要配置子网，使您的子网成为公有子网 (在创建 VPC 和子网后，您可以将 Internet 网关连接到您的 VPC，创建自定义路由表，并为子网配置到 Internet 网关的路由，从而使其中一个子网成为公有子网)
+
+				3.0.0.2.1 创建 Internet 网关
+					$ aws ec2 create-internet-gateway
+					返回{"InternetGateway": {...,"InternetGatewayId": "igw-XXXXXXXX",...}}
+
+				3.0.0.2.2 使用上一步中的 ID 将 Internet 网关连接到您的 VPC
+					$ aws ec2 attach-internet-gateway --vpc-id vpc-XXXXXXXX --internet-gateway-id igw-XXXXXXXX
+
+				3.0.0.2.3 为您的 VPC 创建自定义路由表
+					$ aws ec2 create-route-table --vpc-id vpc-XXXXXXXX
+					返回{"RouteTable": {...,"RouteTableId": "rtb-XXXXXXXX",...}}
+
+				3.0.0.2.4 在路由表中创建一个将所有流量 (0.0.0.0/0) 指向 Internet 网关的路由
+					$ aws ec2 create-route --route-table-id rtb-XXXXXXXX --destination-cidr-block 0.0.0.0/0 --gateway-id igw-XXXXXXXX
+
+				3.0.0.2.5 将路由表与子网关联，以便将来自该子网的流量路由到 Internet 网关
+					$ aws ec2 associate-route-table --subnet-id subnet-XXXXXXXX --route-table-id rtb-XXXXXXXX
+
+					子网id subnet-XXXXXXXX查询方式：
+					$ aws ec2 describe-subnets --filters "Name=vpc-id,Values=vpc-XXXXXXXX" --query 'Subnets[*].{ID:SubnetId,CIDR:CidrBlock}'
+
+			3.0.0.2 在您的 VPC 中创建一个安全组
+				$ aws ec2 create-security-group --group-name FargateSG --description "Security group for Fargate task" --vpc-id vpc-08f1e6a585185cac2
+
+		3.0.1查询已有的subnets securityGroups
+			$ aws ec2 describe-subnets
+			$ aws ec2 describe-security-groups
+
+	3.1创建服务
+		$ aws ecs create-service --cluster ec2-tutorial --service-name cicd_7 --task-definition CICD:1 --desired-count 1 --launch-type "FARGATE" --network-configuration "awsvpcConfiguration={subnets=[subnet-0ea459a8787410966],securityGroups=[sg-0119871f9736b61aa],assignPublicIp=ENABLED}"

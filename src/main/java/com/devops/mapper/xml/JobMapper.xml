@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops.mapper.JobMapper">
+
+	<resultMap id="BaseResultMap" type="com.devops.entity.JenkinsJob">
+		<id column="id" property="id" />
+		<result column="jobName" property="jobName" />
+		<result column="pipelineScript" property="pipelineScript" />
+	</resultMap>
+		<select id="selectPage" resultType="java.util.HashMap">
+	
+		SELECT j.*,t.templateName  FROM `projects_jobs` j 
+		INNER JOIN `code_template` t ON t.`id` = j.`tplId`
+		 WHERE 1=1
+		
+	
+	</select>
+	 
+		<select id="selectJobList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+	
+		SELECT j.*,t.templateName  FROM `projects_jobs` j 
+		INNER JOIN `code_template` t ON t.`id` = j.`tplId`
+		 WHERE 1=1
+		
+		<if test="start != null">
+		<![CDATA[
+			AND j.created >=#{start}
+				 ]]>
+		</if>
+		<if test="end != null">
+		<![CDATA[
+			AND j.created  < #{end}
+			 ]]>
+		</if>
+		<if test="search != null">
+			AND j.jobName LIKE CONCAT('%',#{search,jdbcType=VARCHAR},'%')
+		</if>
+	
+	</select>
+</mapper>

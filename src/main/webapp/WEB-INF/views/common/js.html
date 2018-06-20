@@ -1,0 +1,168 @@
+
+<!-- 确认提示组件 -->
+<div id="confirm-modal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false" style="display: none;">
+  <div class="modal-body">
+    <p>您确定要删除该条记录吗?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" data-dismiss="modal" class="btn btn-default">取消</button>
+    <button type="button"  class="btn btn-primary del">删除</button>
+  </div>
+</div>
+
+<!-- REQUIRED JS SCRIPTS -->
+<!-- jQuery 2.1.4 -->
+<script src="/plugins/jQuery/jQuery-2.1.4.min.js"></script>
+<!-- Bootstrap 3.3.5 -->
+<script src="/plugins/bootstrap/js/bootstrap.min.js"></script>
+<!-- iCheck 1.0.1 -->
+<script src="/plugins/iCheck/icheck.min.js"></script>
+<!-- nice-validator-1.0.8 -->
+<script src="/plugins/nice-validator-1.0.8/jquery.validator.js?local=zh-CN"></script>
+<!--jquery-confirm  -->
+<script src="/plugins/jquery-confirm/jquery-confirm.min.js"></script>
+<!-- Select2 -->
+<script src="/plugins/select2/select2.full.min.js"></script>
+<!-- date -->
+<script src="/plugins/daterangepicker/moment.min.js"></script>
+<script src="/plugins/daterangepicker/daterangepicker.js"></script>
+<!-- jquery.cookie -->
+<script src="/plugins/jquery.cookie.js"></script>
+
+<!-- xlsx -->
+<script src="/plugins/jquery.table2excel.js"></script>
+
+<!-- AdminLTE App -->
+<script src="/app/js/app.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="/app/js/demo.js"></script>
+<!-- 自定义系统初始化话JS -->
+<script src="/app/js/init.js"></script>
+
+<script src="/plugins/layui/layui.js" charset="utf-8"></script>
+<script src="/app/js/x-layui.js" charset="utf-8"></script>
+<script type="text/javascript">
+ 	
+$(function(){
+	//select2
+	$(".select2").select2();
+	//iCheck for checkbox and radio inputs
+	$('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
+       checkboxClass: 'icheckbox_minimal-blue',
+       radioClass: 'iradio_minimal-blue'
+    });
+});
+</script>
+<script type="text/javascript">
+ layui.config({
+	version:true,
+	debug:true,
+   	base: '/app/js/modules/'
+ }).use('xform'); //加载入口
+
+</script>
+<script>
+
+	function getBoforeDate(before){
+		var now = new Date();
+		now.setDate(now.getDate()-before);
+		return now;
+	}
+	
+	function getBoforeMonth(beforeMonth,day){
+		var now = new Date();
+		now.setDate(day);
+		now.setMonth(now.getMonth()-beforeMonth);
+		return now;
+	}
+	
+	$(function(){
+		
+		var now = new Date();
+		
+		$('.date').daterangepicker({
+		    "showWeekNumbers": true,
+		    "showISOWeekNumbers": true,
+		    "ranges": {
+		        "今天": [
+		            now,
+		            now
+		        ],
+		        "昨天": [
+					getBoforeDate(1),
+					getBoforeDate(1)
+		        ],
+		        "最近7天": [
+					getBoforeDate(7),
+					now
+		        ],
+		        "最近30天": [
+		            getBoforeDate(30),
+		            now
+		        ],
+		        "本月": [
+		            getBoforeMonth(0,1),
+		            getBoforeMonth(0,31)
+		        ],
+		        "上个月": [
+					getBoforeMonth(1,1),
+					getBoforeMonth(1,31)
+		        ],
+		        "最近三个月": [
+						getBoforeMonth(2,1),
+						getBoforeMonth(0,31)
+			        ]
+		    },
+		    "locale": {
+		        "format": "YYYY/MM/DD",
+		        "separator": "-",
+		        "applyLabel": "应用",
+		        "cancelLabel": "取消",
+		        "fromLabel": "From",
+		        "toLabel": "To",
+		        "customRangeLabel": "自定义",
+		        "weekLabel": "W",
+		        "daysOfWeek": [
+		            "日",
+		            "一",
+		            "二",
+		            "三",
+		            "四",
+		            "五",
+		            "六"
+		        ],
+		        "monthNames": [
+		            "一月",
+		            "二月",
+		            "三月",
+		            "四月",
+		            "五月",
+		            "六月",
+		            "七月",
+		            "八月",
+		            "九月",
+		            "十月",
+		            "十一月",
+		            "十二月"
+		        ],
+		        "firstDay": 1
+		    },
+		    "alwaysShowCalendars": true,
+		    "autoUpdateInput":false,
+		    "opens": "right",
+		    "buttonClasses": "btn btn-sm"
+		}, function(start, end, label) {
+		  console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
+		});
+		
+		$('.date').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
+        });
+
+        $('.date').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        });
+		
+	});
+</script>
+

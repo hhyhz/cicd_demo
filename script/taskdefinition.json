@@ -1,0 +1,23 @@
+{
+	"family": "cicd-task_EN",
+	"executionRoleArn": "ecstask",
+	"networkMode": "awsvpc",
+	"containerDefinitions": [
+		{
+			"name": "cicd-web",
+			"image": "995807247853.dkr.ecr.us-east-1.amazonaws.com/demo/devops",
+			"portMappings": [
+				{
+					"containerPort": 8080,
+					"hostPort": 8080,
+					"protocol": "tcp"
+				}
+			]
+		}
+	],
+	"requiresCompatibilities": [
+		"FARGATE"
+	],
+	"cpu": "512",
+	"memory": "1024"
+}
