@@ -1,19 +1,18 @@
-#»ù´¡¾µÏñÎª¹Ù·½centos7£¬jdk°æ±¾Îª1.8.0_141£¬tomcat°æ±¾Îª9.0.8¡£Òòjdk½Ï´óËùÒÔÓÃwget»ñÈ¡
-#Ñ¡Ôñ»ù´¡¾µÏñ
+
 FROM centos:7
 MAINTAINER salo
 
-#Ö¸¶¨Íâ²¿ÎÄ¼ş¼Ğ¹ÒÔØµ½ÈİÆ÷ÄÚµÄ/tmpÎÄ¼ş¼Ğ
+#æŒ‡å®šå¤–éƒ¨æ–‡ä»¶å¤¹æŒ‚è½½åˆ°å®¹å™¨å†…çš„/tmpæ–‡ä»¶å¤¹
 #We added a VOLUME pointing to "/tmp" because that is where a Spring Boot application creates working directories 
 #for Tomcat by default. The effect is to create a temporary file on your host under "/var/lib/docker" 
 #and link it to the container under "/tmp". This step is optional for the simple app that we wrote here, 
 #but can be necessary for other Spring Boot applications if they need to actually write in the filesystem.
 #VOLUME /tmp
 
-#ÉèÖÃ¹¤×÷Ä¿Â¼
+#è®¾ç½®å·¥ä½œç›®å½•
 WORKDIR /usr/local/
 
-#°²×°wget,ÏÂÔØjdk£¬½âÑ¹jdk£¬É¾³ıÑ¹Ëõ°ü
+#å®‰è£…wget,ä¸‹è½½jdkï¼Œè§£å‹jdkï¼Œåˆ é™¤å‹ç¼©åŒ…
 RUN yum install -y wget \
 && wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u141-b15/336fa29ff2bb4ef291e347e091f7f4a7/jdk-8u141-linux-x64.tar.gz" \
 && tar xzf jdk-8u141-linux-x64.tar.gz \
@@ -23,10 +22,10 @@ RUN yum install -y wget \
 && rm -rf apache-tomcat-9.0.8.tar.gz
 
 
-#ÉèÖÃ¹¤×÷Ä¿Â¼
+#è®¾ç½®å·¥ä½œç›®å½•
 WORKDIR /usr/local/apache-tomcat-9.0.8
 
-#ÅäÖÃ»·¾³
+#é…ç½®ç¯å¢ƒ
 ENV JAVA_HOME /usr/local/jdk1.8.0_141
 ENV CLASSPATH $JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 ENV CATALINA_HOME /usr/local/apache-tomcat-9.0.8
@@ -35,10 +34,10 @@ ENV PATH $PATH:$JAVA_HOME/bin:$CATALINA_HOME/lib:$CATALINA_HOME/bin
 
 RUN rm -rf webapps/ROOT
 
-#ÉèÖÃ²ÎÊıÃûÎªJAR_FILE£¬ÔÚbuild¾µÏñÊ±¿ÉÒÔÊ¹ÓÃ--build-arg<varname>=<value>À´Ö¸¶¨²ÎÊıÖµ£¬±¾´Î½«´ò°üºÃµÄÏîÄ¿ÎÄ¼şÎª±äÁ¿Öµ
+#è®¾ç½®å‚æ•°åä¸ºJAR_FILEï¼Œåœ¨buildé•œåƒæ—¶å¯ä»¥ä½¿ç”¨--build-arg<varname>=<value>æ¥æŒ‡å®šå‚æ•°å€¼ï¼Œæœ¬æ¬¡å°†æ‰“åŒ…å¥½çš„é¡¹ç›®æ–‡ä»¶ä¸ºå˜é‡å€¼
 ARG JAR_FILE
 
-#½«${JAR_FILE}ÎÄ¼ş£¬¼´´ò°üºÃµÄÏîÄ¿ÎÄ¼ş£¬¸´ÖÆÎª¾µÏñÖĞµÄwarÎÄ¼ş
+#å°†${JAR_FILE}æ–‡ä»¶ï¼Œå³æ‰“åŒ…å¥½çš„é¡¹ç›®æ–‡ä»¶ï¼Œå¤åˆ¶ä¸ºé•œåƒä¸­çš„waræ–‡ä»¶
 ADD ${JAR_FILE} webapps/ROOT.war
 
 CMD ./bin/catalina.sh run
